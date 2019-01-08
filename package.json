@@ -1,0 +1,22 @@
+{
+  "name": "elm-enums",
+  "version": "1.0.0",
+  "description": "Process ./enums.defs -> ./Enums.elm, autogenerating custom types and JSON encoders/decoders from enums.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jmbromley/elm-enums.git"
+  },
+  "author": "J Bromley",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/jmbromley/elm-enums/issues"
+  },
+  "homepage": "https://github.com/jmbromley/elm-enums#readme",
+  "bin": {
+    "elm-enums": "./index.js"
+  }
+}

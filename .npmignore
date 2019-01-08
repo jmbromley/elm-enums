@@ -1,0 +1,7 @@
+*~
+build.sh
+elm.json
+elm-stuff/
+node_modules/
+src/
+testing/
