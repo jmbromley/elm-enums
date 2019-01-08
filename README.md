@@ -81,7 +81,8 @@ handed back to it that it can't understand.
 `elm-enums` is a very basic command-line tool (written in *Elm*!) to take the pain out of handling simple
 custom types (of the form that other languages would refer to as *enums*) that need passing in and out of JSON
 and are prone to frequent change in their set of values.  It can't handle more complex custom types at all (i.e. anything
-that is more than just a union of simple tags), but it aims to make those it can handle as maintenance-free as possible.
+that is more than just a union of simple argumentless constructors), but it aims to make those it can handle as
+maintenance-free as possible.
 
 ### How it works
 
