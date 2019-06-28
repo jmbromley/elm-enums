@@ -1,13 +1,10 @@
 module EnumParser exposing (parse)
 
-import Parser exposing (Parser, (|.), (|=))
-import Set exposing (Set)
-
-
--- LOCAL IMPORTS
-
 import Enum exposing (Enum)
+import Parser exposing ((|.), (|=), Parser)
+import Set exposing (Set)
 import Util
+
 
 
 {-
@@ -135,7 +132,7 @@ enumSequence =
                     |> Parser.map (\_ -> Parser.Done entries)
                 ]
     in
-        Parser.loop [] helper
+    Parser.loop [] helper
 
 
 enum : Parser Enum
@@ -166,6 +163,7 @@ spacesOrComment =
         checkOffset oldOffset newOffset =
             if oldOffset == newOffset then
                 Parser.Done ()
+
             else
                 Parser.Loop newOffset
 
@@ -175,13 +173,13 @@ spacesOrComment =
                 |= Parser.getOffset
                 |> Parser.map (checkOffset offset)
     in
-        Parser.loop 0 <|
-            ifProgress <|
-                Parser.oneOf
-                    [ Parser.lineComment "--"
-                    , Parser.multiComment "{-" "-}" Parser.Nestable
-                    , Parser.spaces
-                    ]
+    Parser.loop 0 <|
+        ifProgress <|
+            Parser.oneOf
+                [ Parser.lineComment "--"
+                , Parser.multiComment "{-" "-}" Parser.Nestable
+                , Parser.spaces
+                ]
 
 
 nameOrValue : Parser String

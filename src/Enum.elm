@@ -1,4 +1,4 @@
-module Enum exposing (Enum, fromList, compileToElm)
+module Enum exposing (Enum, compileToElm, fromList)
 
 import Set exposing (Set)
 
@@ -39,16 +39,16 @@ fromList n v =
                         Just duplicate ->
                             Just duplicate
     in
-        case firstDuplicate v of
-            Nothing ->
-                Valid (ValidEnum { name = n, values = Set.fromList v })
+    case firstDuplicate v of
+        Nothing ->
+            Valid (ValidEnum { name = n, values = Set.fromList v })
 
-            Just duplicate ->
-                Invalid
-                    { name = n
-                    , reason =
-                        ("Multiple identical values of " ++ duplicate ++ " in the definition of this enum.")
-                    }
+        Just duplicate ->
+            Invalid
+                { name = n
+                , reason =
+                    "Multiple identical values of " ++ duplicate ++ " in the definition of this enum."
+                }
 
 
 compileToElm : List Enum -> Result String String
@@ -74,7 +74,7 @@ checkValid unvalidated =
                         Valid valid ->
                             validate rest (valid :: done)
     in
-        validate unvalidated []
+    validate unvalidated []
 
 
 checkUnique : List (ValidEnum PossiblyUnique) -> Result String (List (ValidEnum Unique))
@@ -102,7 +102,7 @@ checkUnique enums =
                         Nothing ->
                             checkIdentifiers rest (Set.union gathered <| Set.insert name values)
     in
-        checkIdentifiers enums Set.empty
+    checkIdentifiers enums Set.empty
 
 
 compile : List (ValidEnum Unique) -> Result String String
@@ -116,12 +116,12 @@ compile enums =
                 (ValidEnum { name, values }) :: rest ->
                     construct
                         (name :: names)
-                        ((makeDeclaration name values) :: declarations)
-                        ((makeEncoder name values) :: encoders)
-                        ((makeDecoder name values) :: decoders)
+                        (makeDeclaration name values :: declarations)
+                        (makeEncoder name values :: encoders)
+                        (makeDecoder name values :: decoders)
                         rest
     in
-        Ok <| construct [] [] [] [] enums
+    Ok <| construct [] [] [] [] enums
 
 
 assemble : List String -> List String -> List String -> List String -> String
@@ -141,7 +141,7 @@ assemble names declarations encoders decoders =
                 ++ headerWarning
                 ++ "\nimport Json.Decode\nimport Json.Encode\n\n\n"
     in
-        header ++ (flatten declarations) ++ "\n\n" ++ (flatten encoders) ++ "\n\n" ++ (flatten decoders)
+    header ++ flatten declarations ++ "\n\n" ++ flatten encoders ++ "\n\n" ++ flatten decoders
 
 
 makeDeclaration : String -> Set String -> String
@@ -152,7 +152,7 @@ makeDeclaration name values =
                 |> List.intersperse "\n    | "
                 |> List.foldl (++) ""
     in
-        "type " ++ name ++ "\n    = " ++ union ++ "\n"
+    "type " ++ name ++ "\n    = " ++ union ++ "\n"
 
 
 makeEncoder : String -> Set String -> String
@@ -176,7 +176,7 @@ makeEncoder name values =
         declaration =
             encoderName ++ " : " ++ name ++ " -> Json.Encode.Value\n" ++ encoderName ++ " value =\n"
     in
-        declaration ++ body
+    declaration ++ body
 
 
 makeDecoder : String -> Set String -> String
@@ -203,7 +203,7 @@ makeDecoder name values =
         declaration =
             decoderName ++ " : Json.Decode.Decoder " ++ name ++ "\n" ++ decoderName ++ " =\n"
     in
-        declaration ++ body
+    declaration ++ body
 
 
 headerWarning : String

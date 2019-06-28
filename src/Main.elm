@@ -1,6 +1,7 @@
-port module Main exposing (..)
+port module Main exposing (Model(..), Msg(..), input, main, output, subscriptions, update)
 
 import EnumParser
+
 
 
 -- PROGRAM
@@ -47,7 +48,7 @@ update msg model =
                                 Ok processed ->
                                     { error = Nothing, result = Just processed }
                     in
-                        ( Finished, output answer )
+                    ( Finished, output answer )
 
         Finished ->
             ( model, Cmd.none )
