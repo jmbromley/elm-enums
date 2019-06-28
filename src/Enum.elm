@@ -131,13 +131,15 @@ assemble names declarations encoders decoders =
             List.intersperse "\n\n" >> List.foldl (++) ""
 
         header =
-            "module Enums\n    exposing\n        ( "
+            "module Enums exposing\n    ( "
                 ++ (List.map (\a -> [ a ++ "(..)", "decode" ++ a, "encode" ++ a ]) names
                         |> List.foldl (++) []
-                        |> List.intersperse "\n        , "
+                        |> List.sort
+                        |> List.reverse
+                        |> List.intersperse "\n    , "
                         |> List.foldl (++) ""
                    )
-                ++ "\n        )\n"
+                ++ "\n    )\n"
                 ++ headerWarning
                 ++ "\nimport Json.Decode\nimport Json.Encode\n\n\n"
     in
@@ -198,7 +200,7 @@ makeDecoder name values =
                 ++ "\n                _ ->\n                    Json.Decode.fail \"Unknown value for "
                 ++ name
                 ++ "\"\n"
-                ++ "    in\n        Json.Decode.string |> Json.Decode.andThen findMatch\n"
+                ++ "    in\n    Json.Decode.string |> Json.Decode.andThen findMatch\n"
 
         declaration =
             decoderName ++ " : Json.Decode.Decoder " ++ name ++ "\n" ++ decoderName ++ " =\n"
