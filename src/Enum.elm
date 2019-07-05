@@ -108,10 +108,10 @@ checkUnique enums =
 compile : List (ValidEnum Unique) -> Result String String
 compile enums =
     let
-        construct names declarations encoders decoders remaining =
+        construct names declarations encoders decoders stringifiers valueLists remaining =
             case remaining of
                 [] ->
-                    assemble names declarations encoders decoders
+                    assemble names declarations encoders decoders stringifiers valueLists
 
                 (ValidEnum { name, values }) :: rest ->
                     construct
@@ -119,20 +119,22 @@ compile enums =
                         (makeDeclaration name values :: declarations)
                         (makeEncoder name values :: encoders)
                         (makeDecoder name values :: decoders)
+                        (makeStringifier name values :: stringifiers)
+                        (makeValueList name values :: valueLists)
                         rest
     in
-    Ok <| construct [] [] [] [] enums
+    Ok <| construct [] [] [] [] [] [] enums
 
 
-assemble : List String -> List String -> List String -> List String -> String
-assemble names declarations encoders decoders =
+assemble : List String -> List String -> List String -> List String -> List String -> List String -> String
+assemble names declarations encoders decoders stringifiers valueLists =
     let
         flatten =
             List.intersperse "\n\n" >> List.foldl (++) ""
 
         header =
             "module Enums exposing\n    ( "
-                ++ (List.map (\a -> [ a ++ "(..)", "decode" ++ a, "encode" ++ a ]) names
+                ++ (List.map (\a -> [ a ++ "(..)", "decode" ++ a, "encode" ++ a, "listAll" ++ a, "stringify" ++ a ]) names
                         |> List.foldl (++) []
                         |> List.sort
                         |> List.reverse
@@ -143,7 +145,16 @@ assemble names declarations encoders decoders =
                 ++ headerWarning
                 ++ "\nimport Json.Decode\nimport Json.Encode\n\n\n"
     in
-    header ++ flatten declarations ++ "\n\n" ++ flatten encoders ++ "\n\n" ++ flatten decoders
+    header
+        ++ flatten declarations
+        ++ "\n\n"
+        ++ flatten encoders
+        ++ "\n\n"
+        ++ flatten decoders
+        ++ "\n\n"
+        ++ flatten stringifiers
+        ++ "\n\n"
+        ++ flatten valueLists
 
 
 makeDeclaration : String -> Set String -> String
@@ -218,3 +229,43 @@ headerWarning =
    You probably want to make modifications to the enums.defs source file rather than here.
 -}
 """
+
+
+makeStringifier : String -> Set String -> String
+makeStringifier name values =
+    let
+        stringifierName =
+            "stringify" ++ name
+
+        entries =
+            Set.toList values
+                |> List.map (\a -> "        " ++ a ++ " ->\n            \"" ++ a ++ "\"\n")
+                |> List.intersperse "\n"
+                |> List.foldl (++) ""
+
+        body =
+            "    case value of\n" ++ entries
+
+        declaration =
+            stringifierName ++ " : " ++ name ++ " -> String\n" ++ stringifierName ++ " value =\n"
+    in
+    declaration ++ body
+
+
+makeValueList : String -> Set String -> String
+makeValueList name values =
+    let
+        valueListName =
+            "listAll" ++ name
+
+        body =
+            Set.toList values
+                |> List.map (\a -> " " ++ a ++ "\n")
+                |> List.intersperse "    ,"
+                |> List.foldl (++) "    ]\n"
+                |> String.append "    ["
+
+        declaration =
+            valueListName ++ " : List " ++ name ++ "\n" ++ valueListName ++ " =\n"
+    in
+    declaration ++ body

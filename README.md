@@ -1,7 +1,8 @@
 # `elm-enums` automatic code generator
 
 **Summary**: `elm-enums` is a command-line tool to autogenerate *Elm* type declarations and JSON encoders/decoders
-for simple *enum-like* custom types.  If you're just interested in how to use it then you can jump straight to the
+for simple *enum-like* custom types.  It will also generate stringifiers and lists of all values for you.
+If you're just interested in how to use it then you can jump straight to the
 [How It Works](#how-it-works) section below.
 
 ## The Problem (a.k.a. `elm-enums`' Raison d'être)
@@ -131,6 +132,16 @@ but prefixed with *encoder/decoder* appropriately.  The type signature of the en
 decodeMyEnum : Json.Decode.Decoder MyEnum
 
 encodeMyEnum : MyEnum -> Json.Encode.Value
+```
+
+`elm-enums` also generates stringifiers and a list of all valid values for you, should you need them (and, thanks to
+dead code elimination in Elm 0.19, at no cost in speed or file size if you don't!).  They have the following type signatures
+and naming scheme and can be imported in a similar fashion:
+
+```elm
+stringifyMyEnum : MyEnum -> String
+
+listAllMyEnum : List MyEnum
 ```
 
 If you need to update an `enum` simply modify `enums.defs` and then rerun `elm-enums`.   The produced `Enums.elm` is
